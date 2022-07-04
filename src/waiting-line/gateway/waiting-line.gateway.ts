@@ -1,10 +1,11 @@
+/* eslint-disable prettier/prettier */
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
-//@WebSocketGateway({cors: {origin: ['http://localhost:4200']}})
+@WebSocketGateway({cors: {origin: ['http://192.168.119.17:4200']}})
 //@WebSocketGateway({cors: {origin: ['http://192.168.1.96:4200']}})
-const configService = new ConfigService();
-@WebSocketGateway({cors: {origin: [configService.get('SOCKET_SERVER_ORIGIN')]}})
+//const configService = new ConfigService();
+//@WebSocketGateway({cors: {origin: [configService.get('SOCKET_SERVER_ORIGIN')]}})
 export class WaitingLineGateway implements OnGatewayConnection, OnGatewayDisconnect{
   /*@SubscribeMessage('message')
   handleMessage(client: any, payload: any): string {
@@ -14,12 +15,12 @@ export class WaitingLineGateway implements OnGatewayConnection, OnGatewayDisconn
   server:Server
 
   handleConnection(client: any, ...args: any[]) {
-    console.log("Connection made");
+    console.log("Conexion Hecha", client.id );
     
   }
 
   handleDisconnect(client: any) {
-    console.log('disconnected')
+    console.log('Desconectado', client.id)
   }
 
   @SubscribeMessage('sendMessage')
@@ -54,6 +55,15 @@ export class WaitingLineGateway implements OnGatewayConnection, OnGatewayDisconn
     
     this.server.emit('waiting-line:get:'+object.tellId, object.data)
   }
+
+  @SubscribeMessage('print-server:set')
+  handlePrintServer(socket: Socket, object:any){
+    
+    console.log("**Recibido en servidor*",object, socket.id )
+                                  
+    this.server.emit('print-server:get:'+object.hqId+':'+object.token, object.data)   
+  }
+
 
 
 }
